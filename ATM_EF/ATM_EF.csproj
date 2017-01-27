@@ -33,7 +33,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,11 +52,54 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201701261942329_Initial.cs" />
+    <Compile Include="Migrations\201701261942329_Initial.Designer.cs">
+      <DependentUpon>201701261942329_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701262244495_AcctNametoAcctModel.cs" />
+    <Compile Include="Migrations\201701262244495_AcctNametoAcctModel.Designer.cs">
+      <DependentUpon>201701262244495_AcctNametoAcctModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701271910059_c.cs" />
+    <Compile Include="Migrations\201701271910059_c.Designer.cs">
+      <DependentUpon>201701271910059_c.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701271925567_acctsCreatedAndProg.cs" />
+    <Compile Include="Migrations\201701271925567_acctsCreatedAndProg.Designer.cs">
+      <DependentUpon>201701271925567_acctsCreatedAndProg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701271934078_createdacctsmore.cs" />
+    <Compile Include="Migrations\201701271934078_createdacctsmore.Designer.cs">
+      <DependentUpon>201701271934078_createdacctsmore.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Acct.cs" />
+    <Compile Include="Models\ATM_Context.cs" />
+    <Compile Include="Models\ATM_Log.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201701261942329_Initial.resx">
+      <DependentUpon>201701261942329_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701262244495_AcctNametoAcctModel.resx">
+      <DependentUpon>201701262244495_AcctNametoAcctModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701271910059_c.resx">
+      <DependentUpon>201701271910059_c.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701271925567_acctsCreatedAndProg.resx">
+      <DependentUpon>201701271925567_acctsCreatedAndProg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701271934078_createdacctsmore.resx">
+      <DependentUpon>201701271934078_createdacctsmore.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
