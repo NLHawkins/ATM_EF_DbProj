@@ -11,8 +11,9 @@ namespace ATM_EF.Models
         public int Id { get; set; }
         public string AcctName { get; set; }
         public double CurrentBalance { get; set; }
+        public User AcctUser { get; set; }
         
 
-        public virtual User User { get; set; }
+        //public virtual User User { get; set; }
     }
 }

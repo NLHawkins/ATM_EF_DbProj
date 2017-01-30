@@ -28,32 +28,31 @@ namespace ATM_EF
             using (var db = new ATM_Context())
             {
                 var userInstance = new User();
-
                 while (loggedIn == false)
                 {
-                    var userName = Read("Username? ");
+                    Console.WriteLine("1) Login");
+                    Console.WriteLine("2) Create New User");
+                    string choiceString = Read("> ");
+                    int choiceTry;
+                    int.TryParse(choiceString, out choiceTry);
+                    if (choiceTry > 0)
+                    {
+                        int choice = int.Parse(choiceString);
 
-                    var userList = db.Users.Where(u => u.UserName == userName).ToList();
-                    if (!userList.Any())
-                    {
-                        Console.WriteLine("Login Unsuccessful Please Try Again");
-                    }
-                    else
-                    {
-                        userInstance = db.Users.Where(u => u.UserName == userName).First();
-                        activeUser = userInstance;
+                        switch (choice)
+                        {
+                            case 1:
+                                Login(db);
+                                break;
+                            case 2:
+                                InitializeAcct(db);
+                                break;
+                            default:
+                                break;
+                        }
+
                     }
 
-                    var passChoice = Read("Password?");
-                    if (activeUser.Password == passChoice)
-                    {
-                        Console.WriteLine("Successful Login");
-                        loggedIn = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Login Unsuccessful Please Try Again");
-                    }
                 }
                 activeAcct = db.Accounts.Where(n => n.AcctName == activeUser.UserName).First();
 
@@ -61,17 +60,17 @@ namespace ATM_EF
                 while (loggedIn == true)
 
                 {
-                    Console.WriteLine("1)  Make Withdrawl");
-                    Console.WriteLine("2) Deposit");
+                    Console.WriteLine("1) Make Withdrawl");
+                    Console.WriteLine("2) Deposit Funds");
                     Console.WriteLine("3) Print Balance");
-                    Console.WriteLine("4) Transfer");
+                    Console.WriteLine("4) Transfer Funds");
                     Console.WriteLine("5) Logout");
                     int choice = int.Parse(Read("> "));
 
                     switch (choice)
                     {
                         case 1:
-                            Withdraw(db);
+                            WithdrawWithODP(db);
                             break;
                         case 2:
                             Deposit(db);
@@ -88,22 +87,34 @@ namespace ATM_EF
                         default:
                             break;
                     }
-
-                    var newATM_Log = new ATM_Log()
-                    {
-                        ActiveAcct = activeAcct,
-                        Time = time,
-                        Adjustment = adjustment,
-                        AdjValue = adjValue,
-                        RecipientAcct = recipientAcct,
-                        LogBalance = logBalance                                               
-                    };
-
-                    db.ATM_Logs.Add(newATM_Log);
-                    db.SaveChanges();
+                }
+            }
+        }
 
 
-                } 
+        private static void Login(ATM_Context db)
+        {
+            var userName = Read("Username? ");
+            var passChoice = Read("Password?");
+            var userList = db.Users.Where(u => u.UserName == userName).ToList();
+            if (!userList.Any())
+            {
+                Console.WriteLine("Login Unsuccessful Please Try Again");
+            }
+            else
+            {
+                var userInstance = db.Users.Where(u => u.UserName == userName).First();
+                activeUser = userInstance;
+            }
+
+            if (activeUser.Password == passChoice)
+            {
+                Console.WriteLine("Successful Login");
+                loggedIn = true;
+            }
+            else
+            {
+                Console.WriteLine("Login Unsuccessful Please Try Again");
             }
         }
 
@@ -128,10 +139,25 @@ namespace ATM_EF
                     string confirmChoice = Read("> ");
                     if (confirmChoice.ToLower() == "y")
                     {
+                        DateTime time = DateTime.Now;
                         recipientAcct.CurrentBalance = recipientAcct.CurrentBalance + adjValue;
                         activeAcct.CurrentBalance = activeAcct.CurrentBalance - adjValue;
+                        logBalance = activeAcct.CurrentBalance;
                         adjustment = "transfer";
                         Console.WriteLine("Transfer Complete");
+                        var newATM_Log = new ATM_Log()
+                        {
+                            ActiveAcct = activeAcct,
+                            Time = time,
+                            Adjustment = adjustment,
+                            AdjValue = adjValue,
+                            RecipientAcct = recipientAcct,
+                            LogBalance = logBalance
+
+                        };
+
+                        db.ATM_Logs.Add(newATM_Log);
+                        db.SaveChanges();
                         transfering = false;
                     }
                     else
@@ -157,11 +183,10 @@ namespace ATM_EF
                             break;
                         case 3:
                             transfering = false;
-                            break;                       
+                            break;
                         default:
                             break;
                     }
-
                 }
             }
         }
@@ -184,7 +209,7 @@ namespace ATM_EF
                 double adjValue = double.Parse(Read("How Much would you like to Withdraw?> "));
                 if (activeAcct.CurrentBalance - adjValue < 0)
                 {
-                    Console.WriteLine("There are insufficient fund for this withdrawl");
+                    Console.WriteLine("There are insufficient funds for this withdrawl");
                     Console.WriteLine("1) Main Menu");
                     Console.WriteLine("2) Get Balance");
                     Console.WriteLine("3) Withdraw a lesser amount");
@@ -209,65 +234,143 @@ namespace ATM_EF
                             break;
                     }
                 }
+
                 else
                 {
                     activeAcct.CurrentBalance = activeAcct.CurrentBalance - adjValue;
                     logBalance = activeAcct.CurrentBalance - adjValue;
-                    adjustment = "transfer";
+                    adjustment = "withdrawl (-)";
                     Console.WriteLine($"Withdrawing ${adjValue}");
+                    DateTime time = DateTime.Now;
+                    var newATM_Log = new ATM_Log()
+                    {
+                        ActiveAcct = activeAcct,
+                        Time = time,
+                        Adjustment = adjustment,
+                        AdjValue = adjValue,
+                        LogBalance = logBalance
+                    };
+
+                    db.ATM_Logs.Add(newATM_Log);
+                    db.SaveChanges();
+                    withdrawing = false;
+                }
+            }
+        }
+        private static void WithdrawWithODP(ATM_Context db)
+        {
+            bool withdrawing = true;
+            while (withdrawing == true)
+            {
+                double adjValue = double.Parse(Read("How Much would you like to Withdraw?> "));
+                if (activeAcct.CurrentBalance - adjValue < 0)
+                {
+                    activeAcct.CurrentBalance = activeAcct.CurrentBalance - adjValue - 15;
+                    logBalance = activeAcct.CurrentBalance - adjValue;
+                    adjustment = "withdrawl (-)";
+                    Console.WriteLine($"Withdrawing ${adjValue}");
+                    Console.WriteLine("Your account has insufficient funds to cover this withdrawl; a" +
+                        " $15.00 fee has been charged to your account.");
+                    Console.WriteLine($"Your Balance is now ${activeAcct.CurrentBalance}");
+                    DateTime time = DateTime.Now;
+                    var newATM_Log = new ATM_Log()
+                    {
+                        ActiveAcct = activeAcct,
+                        Time = time,
+                        Adjustment = adjustment,
+                        AdjValue = adjValue,
+                        LogBalance = logBalance
+                    };
+
+                    db.ATM_Logs.Add(newATM_Log);
+                    db.SaveChanges();
+                    withdrawing = false;
+
+                }
+                else
+                {
+                    activeAcct.CurrentBalance = activeAcct.CurrentBalance - adjValue;
+                    logBalance = activeAcct.CurrentBalance - adjValue;
+                    adjustment = "withdrawl (-)";
+                    Console.WriteLine($"Withdrawing ${adjValue}");
+                    DateTime time = DateTime.Now;
+                    var newATM_Log = new ATM_Log()
+                    {
+                        ActiveAcct = activeAcct,
+                        Time = time,
+                        Adjustment = adjustment,
+                        AdjValue = adjValue,
+                        LogBalance = logBalance
+                    };
+
+                    db.ATM_Logs.Add(newATM_Log);
+                    db.SaveChanges();
                     withdrawing = false;
                 }
             }
         }
 
+
         private static void Deposit(ATM_Context db)
         {
-            double deposit = double.Parse(Read("How much would you like to Deposit"));
+            double deposit = double.Parse(Read("How much would you like to Deposit >"));
             adjustment = "deposit (+)";
-            activeAcct.CurrentBalance = activeAcct.CurrentBalance + deposit;            
+            Console.WriteLine($"Depositing ${deposit}");
+            activeAcct.CurrentBalance = activeAcct.CurrentBalance + deposit;
             adjValue = deposit;
             logBalance = activeAcct.CurrentBalance + deposit;
-            
-        }
-
-        private static void CreateAcctAdmin(ATM_Context db)
-        {
-            foreach (var user in db.Users)
+            DateTime time = DateTime.Now;
+            var newATM_Log = new ATM_Log()
             {
-                Console.WriteLine($"{user.Id} -- {user.UserName}");
-            }
-
-            int userId = int.Parse(Read("User ID? "));
-            var userInstance = new User();
-            var userList = db.Users.Where(u => u.Id == userId).ToList();
-            if (!userList.Any())
-            {
-                CreateNewUser(db);
-            }
-            else
-            {
-                userInstance = db.Users.Where(u => u.Id == userId).First();
-            }
-
-            var currentBalance = double.Parse(Read("Balance?"));
-
-            var newAcct = new Acct()
-            {
-                
-                AcctName = userInstance.UserName,
-                CurrentBalance = currentBalance
+                ActiveAcct = activeAcct,
+                Time = time,
+                Adjustment = adjustment,
+                AdjValue = adjValue,
+                LogBalance = logBalance
             };
-            db.Accounts.Add(newAcct);
+
+            db.ATM_Logs.Add(newATM_Log);
             db.SaveChanges();
         }
 
+        private static void InitializeAcct(ATM_Context db)
+        {
+
+            CreateNewUser(db);
+
+            Console.WriteLine();
+            var user = db.Users.Where(u => u.UserName == activeUser.UserName).First();
+            var newAcct = new Acct()
+            {
+                AcctUser = user,
+                AcctName = user.UserName,
+                CurrentBalance = 0
+            };
+
+            db.Accounts.Add(newAcct);
+            db.SaveChanges();
+            Console.WriteLine($"Your Account has been intialized with the Username: [{user.UserName}]" +
+                $" , with the Password [{user.Password}]");
+            Console.WriteLine("Please login to this Acct to deposit an initial balalnce");
+
+        }
         private static void CreateNewUser(ATM_Context db)
         {
-            var allUsers = db.Users.Count();
-            Console.WriteLine($"Number of Users - {allUsers}");
 
             var userName = Read("UserName?-");
             var passWord = Read("Password?-");
+
+            var userNameCheckList = db.Users.Where(u => u.UserName == userName).ToList();
+            if (!userNameCheckList.Any())
+            {
+                Console.WriteLine("Press Enter to initialize User");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine("This Username is unavailable, please choose another Username.");
+                CreateNewUser(db);
+            }
 
             var newUser = new User()
             {

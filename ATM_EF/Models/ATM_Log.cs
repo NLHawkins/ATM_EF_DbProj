@@ -16,8 +16,7 @@ namespace ATM_EF.Models
         public Acct RecipientAcct { get; set; }
         public double LogBalance { get; set; }
 
-        public virtual Acct Acct { get; set; }
-        public virtual User User { get; set; }
+        
                
     }
 }

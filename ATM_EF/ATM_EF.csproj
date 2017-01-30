@@ -72,6 +72,10 @@
     <Compile Include="Migrations\201701271934078_createdacctsmore.Designer.cs">
       <DependentUpon>201701271934078_createdacctsmore.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701292155297_resetTablesacctInfoUpdate.cs" />
+    <Compile Include="Migrations\201701292155297_resetTablesacctInfoUpdate.Designer.cs">
+      <DependentUpon>201701292155297_resetTablesacctInfoUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Acct.cs" />
     <Compile Include="Models\ATM_Context.cs" />
@@ -99,6 +103,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701271934078_createdacctsmore.resx">
       <DependentUpon>201701271934078_createdacctsmore.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701292155297_resetTablesacctInfoUpdate.resx">
+      <DependentUpon>201701292155297_resetTablesacctInfoUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
